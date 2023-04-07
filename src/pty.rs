@@ -1,6 +1,7 @@
 #![allow(clippy::module_name_repetitions)]
 
-use std::io::{Read as _, Write as _};
+use std::os::unix::prelude::{AsFd, AsRawFd, BorrowedFd, FromRawFd, OwnedFd, RawFd};
+use std::io::{Read, Write};
 
 type AsyncPty = tokio::io::unix::AsyncFd<crate::sys::Pty>;
 
@@ -59,14 +60,14 @@ impl Pty {
     }
 }
 
-impl From<Pty> for std::os::fd::OwnedFd {
+impl From<Pty> for OwnedFd {
     fn from(pty: Pty) -> Self {
         pty.0.into_inner().into()
     }
 }
 
-impl std::os::fd::AsFd for Pty {
-    fn as_fd(&self) -> std::os::fd::BorrowedFd<'_> {
+impl AsFd for Pty {
+    fn as_fd(&self) -> BorrowedFd<'_> {
         self.0.get_ref().as_fd()
     }
 }

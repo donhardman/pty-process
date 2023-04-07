@@ -1,3 +1,5 @@
+use std::os::unix::prelude::{OwnedFd, AsFd, BorrowedFd};
+
 /// An allocated pty
 pub struct Pty(crate::sys::Pty);
 
@@ -30,14 +32,14 @@ impl Pty {
     }
 }
 
-impl From<Pty> for std::os::fd::OwnedFd {
+impl From<Pty> for OwnedFd {
     fn from(pty: Pty) -> Self {
         pty.0.into()
     }
 }
 
-impl std::os::fd::AsFd for Pty {
-    fn as_fd(&self) -> std::os::fd::BorrowedFd<'_> {
+impl AsFd for Pty {
+    fn as_fd(&self) -> BorrowedFd<'_> {
         self.0.as_fd()
     }
 }

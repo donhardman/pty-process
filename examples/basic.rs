@@ -2,7 +2,7 @@ mod raw_guard;
 
 mod main {
     use std::io::{Read as _, Write as _};
-    use std::os::fd::{AsFd as _, AsRawFd as _};
+    use std::os::unix::prelude::{AsFd, AsRawFd, BorrowedFd, FromRawFd, OwnedFd, RawFd};
 
     pub fn run(
         child: &mut std::process::Child,

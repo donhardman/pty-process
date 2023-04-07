@@ -1,4 +1,4 @@
-use std::os::fd::{AsRawFd as _, FromRawFd as _};
+use std::os::unix::prelude::{AsRawFd, AsFd, BorrowedFd, FromRawFd, OwnedFd, RawFd};
 
 #[derive(Debug)]
 pub struct Pty(pub nix::pty::PtyMaster);
@@ -58,7 +58,7 @@ impl Pty {
     }
 }
 
-impl From<Pty> for std::os::fd::OwnedFd {
+impl From<Pty> for OwnedFd {
     fn from(pty: Pty) -> Self {
         let Pty(nix_ptymaster) = pty;
         let raw_fd = nix_ptymaster.as_raw_fd();
@@ -71,23 +71,23 @@ impl From<Pty> for std::os::fd::OwnedFd {
     }
 }
 
-impl std::os::fd::AsFd for Pty {
-    fn as_fd(&self) -> std::os::fd::BorrowedFd<'_> {
+impl AsFd for Pty {
+    fn as_fd(&self) -> BorrowedFd<'_> {
         let raw_fd = self.0.as_raw_fd();
 
         // Safety: nix::pty::PtyMaster is required to contain a valid file
         // descriptor, and it is owned by self
-        unsafe { std::os::fd::BorrowedFd::borrow_raw(raw_fd) }
+        unsafe { BorrowedFd::borrow_raw(raw_fd) }
     }
 }
 
-impl std::os::fd::AsRawFd for Pty {
-    fn as_raw_fd(&self) -> std::os::fd::RawFd {
+impl AsRawFd for Pty {
+    fn as_raw_fd(&self) -> RawFd {
         self.0.as_raw_fd()
     }
 }
 
-pub struct Pts(std::os::fd::OwnedFd);
+pub struct Pts(OwnedFd);
 
 impl Pts {
     pub fn setup_subprocess(
@@ -117,20 +117,20 @@ impl Pts {
     }
 }
 
-impl From<Pts> for std::os::fd::OwnedFd {
+impl From<Pts> for OwnedFd {
     fn from(pts: Pts) -> Self {
         pts.0
     }
 }
 
-impl std::os::fd::AsFd for Pts {
-    fn as_fd(&self) -> std::os::fd::BorrowedFd<'_> {
+impl AsFd for Pts {
+    fn as_fd(&self) -> BorrowedFd<'_> {
         self.0.as_fd()
     }
 }
 
-impl std::os::fd::AsRawFd for Pts {
-    fn as_raw_fd(&self) -> std::os::fd::RawFd {
+impl AsRawFd for Pts {
+    fn as_raw_fd(&self) -> RawFd {
         self.0.as_raw_fd()
     }
 }
